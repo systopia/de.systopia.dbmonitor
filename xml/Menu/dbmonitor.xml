@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/setting/dbmonitor</path>
+    <page_callback>CRM_Dbmonitor_Form_Settings</page_callback>
+    <title>DB Monitor Settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>
