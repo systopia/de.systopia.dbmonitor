@@ -44,7 +44,7 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
     $this->add(
         'text',
         'threshold',
-        E::ts('Threshold'),
+        E::ts('Threshold (seconds)'),
         [],
         TRUE
     );
