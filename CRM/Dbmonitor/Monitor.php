@@ -19,6 +19,8 @@ use CRM_Dbmonitor_ExtensionUtil as E;
  */
 class CRM_Dbmonitor_Monitor {
 
+  protected static $monitoring_temporarily_disabled = false;
+
   /**
    * Get a list of stuck queries.
    *  Fields: id, runtime, state, sql
@@ -33,12 +35,13 @@ class CRM_Dbmonitor_Monitor {
       $threshold = self::getThreshold();
       $process_list = CRM_Core_DAO::executeQuery("SHOW PROCESSLIST;");
       while ($process_list->fetch()) {
-        if ($process_list->Time >= $threshold) {
+        if ($process_list->Time >= $threshold && !empty($process_list->State)) {
           $stuck_queries[] = [
-              'id'      => $process_list->Id,
-              'runtime' => $process_list->Time,
-              'state'   => $process_list->State,
-              'sql'     => $process_list->Info,
+              'id'           => $process_list->Id,
+              'runtime'      => $process_list->Time,
+              'runtime_text' => self::renderRuntime($process_list->Time),
+              'state'        => $process_list->State,
+              'sql'          => $process_list->Info,
           ];
         }
       }
@@ -107,12 +110,15 @@ class CRM_Dbmonitor_Monitor {
    * Check if the query monitoring is enabled for the current user
    */
   public static function monitoringEnabledForUser() {
-    // check if generally enabled
-    if (!self::monitoringEnabled()) {
-      return false;
-    }
+    return self::monitoringEnabled() && self::userHasMonitoringPermissions();
+  }
 
-    // check permissions
+  /**
+   * Check if the current user has monitoring permissions
+   *
+   * @return bool
+   */
+  public static function userHasMonitoringPermissions() {
     $permissions = self::getPermissions();
     foreach ($permissions as $permission) {
       if (CRM_Core_Permission::check($permission)) {
@@ -140,7 +146,18 @@ class CRM_Dbmonitor_Monitor {
    * @return bool enabled?
    */
   public static function monitoringEnabled() {
-    return (bool) Civi::settings()->get('dbmonitor_enabled');
+    if (self::$monitoring_temporarily_disabled) {
+      return false;
+    } else {
+      return (bool) Civi::settings()->get('dbmonitor_enabled');
+    }
+  }
+
+  /**
+   * temporarily disable monitoring
+   */
+  public static function disableMonitoring() {
+    self::$monitoring_temporarily_disabled = true;
   }
 
   /**
@@ -159,7 +176,6 @@ class CRM_Dbmonitor_Monitor {
    * @return integer time in seconds
    */
   public static function getThreshold() {
-    return 0;
     $threshold = (int) Civi::settings()->get('dbmonitor_threshold');
     if ($threshold) {
       return $threshold;

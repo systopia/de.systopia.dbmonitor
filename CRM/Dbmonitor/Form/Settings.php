@@ -22,6 +22,10 @@ use CRM_Dbmonitor_ExtensionUtil as E;
 class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
   public function buildQuickForm() {
 
+    if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
+      throw new Exception(E::ts("You don't have the permission required to edit the DB monitoring settings."));
+    }
+
     $this->add(
         'checkbox',
         'monitoring',
@@ -64,6 +68,10 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
   }
 
   public function postProcess() {
+    if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
+      throw new Exception(E::ts("You don't have the permission required to edit the DB monitoring settings."));
+    }
+
     $values = $this->exportValues();
 
     // set values

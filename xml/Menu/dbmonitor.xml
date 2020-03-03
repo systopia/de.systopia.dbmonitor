@@ -5,5 +5,14 @@
     <page_callback>CRM_Dbmonitor_Form_Settings</page_callback>
     <title>DB Monitor Settings</title>
     <access_arguments>administer CiviCRM</access_arguments>
+    <adminGroup>System Settings</adminGroup>
+    <icon>admin/small/online_contribution_pages.png</icon>
+    <weight>100</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/dbprocesslist</path>
+    <page_callback>CRM_Dbmonitor_Page_ProcessList</page_callback>
+    <title>Conspicuous Query List</title>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>
