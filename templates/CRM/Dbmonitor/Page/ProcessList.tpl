@@ -19,7 +19,9 @@
         <tr>
             <th>{ts}Process ID{/ts}</th>
             <th>{ts}Status{/ts}</th>
+            <th>{ts}Query{/ts}</th>
             <th>{ts}Running Since{/ts}</th>
+            <th>{ts}Actions{/ts}</th>
         </tr>
         </thead>
         <tbody>
@@ -28,6 +30,7 @@
             <tr>
                 <td>{$query.id}</td>
                 <td>{$query.state}</td>
+                <td><a title="{$query.sql}">{$query.sql_short}</a></td>
                 <td>{$query.runtime_text}</td>
                 <td>
                     <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=kill&id=$query_id"}" title="{ts}Cancel the query{/ts}" class="action-item crm-hover-button">{ts}Kill{/ts}</a>

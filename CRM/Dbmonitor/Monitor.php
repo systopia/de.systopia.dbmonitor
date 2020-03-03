@@ -33,7 +33,7 @@ class CRM_Dbmonitor_Monitor {
       $stuck_queries = [];
 
       $threshold = self::getThreshold();
-      $process_list = CRM_Core_DAO::executeQuery("SHOW PROCESSLIST;");
+      $process_list = CRM_Core_DAO::executeQuery("SHOW FULL PROCESSLIST;");
       while ($process_list->fetch()) {
         if ($process_list->Time >= $threshold && !empty($process_list->State)) {
           $stuck_queries[] = [
@@ -42,6 +42,7 @@ class CRM_Dbmonitor_Monitor {
               'runtime_text' => self::renderRuntime($process_list->Time),
               'state'        => $process_list->State,
               'sql'          => $process_list->Info,
+              'sql_short'    => substr($process_list->Info, 0, 64),
           ];
         }
       }
