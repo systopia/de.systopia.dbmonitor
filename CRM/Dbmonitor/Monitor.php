@@ -58,7 +58,7 @@ class CRM_Dbmonitor_Monitor {
     if (self::monitoringEnabledForUser()) {
       $queries = self::getStuckQueries();
       if (count($queries) > 0) {
-        $url = 'civicrm/todo';
+        $url = CRM_Utils_System::url('civicrm/admin/dbprocesslist');
         if (count($queries) > 1) {
           $threshold = self::renderRuntime(self::getThreshold());
           CRM_Core_Session::setStatus(
