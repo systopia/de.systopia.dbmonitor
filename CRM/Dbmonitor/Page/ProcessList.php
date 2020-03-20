@@ -32,7 +32,19 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     $this->performOperation($operation, $query_id);
 
     // just add the queries
-    $this->assign('queries', CRM_Dbmonitor_Monitor::getStuckQueries());
+    $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
+    $this->assign('query_count', count($queries));
+    $own_queries = [];
+    $foreign_queries = [];
+    foreach ($queries as $query) {
+      if (empty($query['db'])) {
+        $own_queries[] = $query;
+      } else {
+        $foreign_queries[] = $query;
+      }
+    }
+    $this->assign('queries', $own_queries);
+    $this->assign('foreign_queries', $foreign_queries);
 
     // that's it
     parent::run();
