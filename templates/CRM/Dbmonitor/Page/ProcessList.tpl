@@ -15,7 +15,7 @@
 {crmScope extensionKey='de.systopia.dbmonitor'}
 <div class="crm-block crm-content-block crm-dbmonitor-content-block">
 
-{if $query_count = 0}
+{if $query_count eq 0}
     <h3>{ts}There are currently no conspicuous queries running in the database{/ts}</h3>
 {else}
     <h3>{ts}Conspicuous queries in CiviCRM's database{/ts}</h3>
