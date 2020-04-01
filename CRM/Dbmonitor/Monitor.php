@@ -32,7 +32,10 @@ class CRM_Dbmonitor_Monitor {
     if ($stuck_queries === null) {
       $stuck_queries = [];
 
+      // get some params
+      $database  = DB::parseDSN(CIVICRM_DSN)['database'];
       $threshold = self::getThreshold();
+
       $process_list = CRM_Core_DAO::executeQuery("SHOW FULL PROCESSLIST;");
       while ($process_list->fetch()) {
         if ($process_list->Time >= $threshold && !empty($process_list->State)) {
@@ -43,6 +46,7 @@ class CRM_Dbmonitor_Monitor {
               'state'        => $process_list->State,
               'sql'          => $process_list->Info,
               'sql_short'    => substr($process_list->Info, 0, 64),
+              'db'           => ($process_list->db == $database) ? '' : $process_list->db,
           ];
         }
       }
