@@ -188,4 +188,69 @@ class CRM_Dbmonitor_Monitor {
       return (int) get_cfg_var('max_execution_time');
     }
   }
+
+    /**
+     * Send an email report of the stuck queries to the given email addresses
+     *
+     * @param array $recipients
+     *  recipients of the report, list of email addresses
+     * @param array $queries
+     *  query list as produced by CRM_Dbmonitor_Monitor::getStuckQueries(). If null, will be pulled there
+     *
+     * @throws Exception
+     *   in case anything's wrong
+     */
+  public static function sendEmailReport($recipients, $queries = null)
+  {
+      if ($queries === null) {
+          $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
+      }
+
+      if (!empty($queries)) {
+          if (empty($recipients)) {
+              throw new Exception("No recipients");
+          }
+
+          // compile email
+          $url_parts = parse_url(CRM_Core_Config::singleton()->userFrameworkBaseURL);
+          list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+          $domain = CRM_Core_BAO_Domain::getDomain();
+          $email = [
+              'subject' => E::ts("DB Monitoring: Conspicuous queries spotted on '%1 (%2)'", [
+                  1 => trim($url_parts['host'] . $url_parts['path'], '/ '),
+                  2 => $domain->_database
+              ]),
+              'from'    => CRM_Utils_Mail::formatRFC822Email($domainEmailName, $domainEmailAddress),
+          ];
+
+          // render content
+          $smarty = CRM_Core_Smarty::singleton();
+          $smarty->assign('queries', $queries);
+          $smarty->assign('dbmonitorlink', CRM_Utils_System::url('civicrm/admin/dbprocesslist', null, true));
+          $smarty_template = E::path('templates/probe_email.tpl');
+          $email['html'] = $smarty->fetch($smarty_template);
+
+          // add queries as attachments
+          foreach ($queries as $query) {
+              // write queries out as files to attach to email
+              // remark: using the same files every time, so we don't clog up /tmp
+              $file_name = "process-{$query['id']}.sql";
+              $tmp_file_name = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'dbmonitor_' .  $file_name;
+              file_put_contents($tmp_file_name, $query['sql']);
+
+              // and add as attachment
+              $email['attachments'][] = [
+                  'fullPath'  => $tmp_file_name,
+                  'mime_type' => 'application/sql',
+                  'cleanName' => $file_name,
+              ];
+          }
+
+          // finally: send out to each contact individually
+          foreach ($recipients as $recipient) {
+              $email['toEmail'] = $recipient;
+              CRM_Utils_Mail::send($email);
+          }
+      }
+  }
 }
