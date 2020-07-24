@@ -44,5 +44,7 @@
         {/foreach}
         </tbody>
     </table>
+
+    <p>{ts 1=$dbmonitorlink}You have the option to kill some of those processes <a href="%1">HERE</a>.{/ts}</p>
  </body>
 {/crmScope}
