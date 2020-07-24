@@ -216,7 +216,7 @@ class CRM_Dbmonitor_Monitor {
           list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
           $domain = CRM_Core_BAO_Domain::getDomain();
           $email = [
-              'subject' => E::ts("DB Monitoring: Stuck queries on '%1 (%2)'", [
+              'subject' => E::ts("DB Monitoring: Conspicuous queries spotted on '%1 (%2)'", [
                   1 => trim($url_parts['host'] . $url_parts['path'], '/ '),
                   2 => $domain->_database
               ]),

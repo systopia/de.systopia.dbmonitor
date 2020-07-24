@@ -12,9 +12,18 @@
 +-------------------------------------------------------*}
 
 {crmScope extensionKey='de.systopia.dbmonitor'}
+{literal}
+<style>
+    tr { border: .1pt }
+    table { border: solid }
+    thead { background: white }
+    tr.odd { background: grey }
+    tr.even { background: lightgrey }
+</style>
+{/literal}
  <body>
     <h3>{ts}Conspicuous queries in CiviCRM's database{/ts}</h3>
-    <table>
+    <table >
         <thead>
         <tr>
             <th>{ts}Process ID{/ts}</th>
