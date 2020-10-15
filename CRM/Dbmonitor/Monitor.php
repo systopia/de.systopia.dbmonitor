@@ -45,6 +45,7 @@ class CRM_Dbmonitor_Monitor {
               'runtime_text' => self::renderRuntime($process_list->Time),
               'state'        => $process_list->State,
               'sql'          => $process_list->Info,
+              'type'         => self::getQueryType($process_list->Info),
               'sql_short'    => substr($process_list->Info, 0, 64),
               'db'           => ($process_list->db == $database) ? '' : $process_list->db,
           ];
@@ -252,5 +253,28 @@ class CRM_Dbmonitor_Monitor {
               CRM_Utils_Mail::send($email);
           }
       }
+  }
+
+  /**
+   * Run a heuristic to determine the type/classification of the query
+   *
+   * @param string $sql
+   *   SQL query
+   *
+   * @return string
+   *   human readable string to give an indication of what kind of query it is
+   */
+  public static function getQueryType($sql) {
+    // simply look for a couple if tell-tale strings in the query...
+    if (preg_match('/INTO civicrm_tmp_._gccache/i', $sql)) {
+      return E::ts("GroupCache Rebuild");
+    }
+    if (preg_match('/_dedupe_/', $sql)) {
+      return E::ts("Deduplication");
+    }
+    if (preg_match('/civireport/', $sql)) {
+      return E::ts("CiviCRM Report");
+    }
+    return E::ts("Unknown");
   }
 }

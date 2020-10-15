@@ -28,6 +28,7 @@
         <tr>
             <th>{ts}Process ID{/ts}</th>
             <th>{ts}Status{/ts}</th>
+            <th>{ts}Type{/ts}</th>
             <th>{ts}Query{/ts}</th>
             <th>{ts}Running Since{/ts}</th>
         </tr>
@@ -38,6 +39,7 @@
             <tr>
                 <td>{$query.id}</td>
                 <td>{$query.state}</td>
+                <td>{$query.type}</td>
                 <td><a title="{$query.sql}">{$query.sql_short}</a></td>
                 <td>{$query.runtime_text}</td>
             </tr>
