@@ -1,9 +1,6 @@
 # de.systopia.dbmonitor
 
-![Screenshot](/images/screenshot.png)
-
-+ check the system for stuck queries and send an email if there are any.
-+ you may install this extension, if you want to be informed about stuck database-queries 
++ checks the system for stuck database queries and sends an email alert if there are any.
 + The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
@@ -63,8 +60,3 @@ if empty, the current user is addressed.
 this extension is adding a new cron-job: **Check for conspicuous database queries**.
 + the cron-job is executing the APIv3-action **DBmonitor.probe**
 + as a parameter you may add: **email_recipients=** followed by a comma-separated list of email-addresses
-
-
-## Known Issues
-
-(* FIXME *)
