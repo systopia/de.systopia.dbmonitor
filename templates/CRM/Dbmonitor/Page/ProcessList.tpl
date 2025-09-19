@@ -40,8 +40,8 @@
                 <td><a title="{$query.sql}">{$query.sql_short}</a></td>
                 <td>{$query.runtime_text}</td>
                 <td>
-                    <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=kill&id=$query_id"}" title="{ts}Cancel the query{/ts}" class="action-item crm-hover-button">{ts}Kill{/ts}</a>
-                    <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=export&id=$query_id"}" title="{ts}Export SQL{/ts}" class="action-item crm-hover-button">{ts}Export{/ts}</a>
+                    <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=kill&id=$query_id"}" title="{ts escape='htmlattribute'}Cancel the query{/ts}" class="action-item crm-hover-button">{ts}Kill{/ts}</a>
+                    <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=export&id=$query_id"}" title="{ts escape='htmlattribute'}Export SQL{/ts}" class="action-item crm-hover-button">{ts}Export{/ts}</a>
                 </td>
             </tr>
         {/foreach}
@@ -76,7 +76,7 @@
                 <td><a title="{$query.sql}">{$query.sql_short}</a></td>
                 <td>{$query.runtime_text}</td>
                 <td>
-                    <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=export&id=$query_id"}" title="{ts}Export SQL{/ts}" class="action-item crm-hover-button">{ts}Export{/ts}</a>
+                    <a href="{crmURL p="civicrm/admin/dbprocesslist" q="op=export&id=$query_id"}" title="{ts escape='htmlattribute'}Export SQL{/ts}" class="action-item crm-hover-button">{ts}Export{/ts}</a>
                 </td>
             </tr>
         {/foreach}
