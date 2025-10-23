@@ -57,7 +57,7 @@ function civicrm_api3_d_b_monitor_probe(&$params)
                         'option.limit' => 1,
                     ]
                 );
-            } catch (CiviCRM_API3_Exception $ex) {
+            } catch (CRM_Core_Exception $ex) {
                 // contact doesn't seem to have a primary email
             }
         }
