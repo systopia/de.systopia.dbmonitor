@@ -17,7 +17,7 @@ use CRM_Dbmonitor_ExtensionUtil as E;
 
 class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
 
-  public function run() {
+  public function run(): void {
     CRM_Utils_System::setTitle(E::ts('Conspicuous Database Queries'));
 
     if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
@@ -55,14 +55,14 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
   /**
    * Execute the passed operation
    *
-   * @param $operation string operation name
-   * @param $query_id  int    query id
+   * @param string|null $operation string operation name
+   * @param int|null $query_id  int    query id
    */
-  protected function performOperation($operation, $query_id) {
+  protected function performOperation(?string $operation, ?int $query_id): void {
     switch ($operation) {
       case 'kill':
         // kill the query
-        if ($query_id) {
+        if ($query_id !== NULL && $query_id > 0) {
           CRM_Core_DAO::executeQuery("KILL QUERY {$query_id};");
         }
         CRM_Core_Session::setStatus(

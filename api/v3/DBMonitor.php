@@ -17,8 +17,10 @@ use CRM_Dbmonitor_ExtensionUtil as E;
 
 /**
  * Adjust Metadata for DBMonitor.probe
+ *
+ * @param array<string, mixed> $params
  */
-function _civicrm_api3_d_b_monitor_probe_spec(&$params) {
+function _civicrm_api3_d_b_monitor_probe_spec(array &$params): void {
   $params['email_recipients'] = [
     'name'         => 'email_recipients',
     'api.required' => 0,
@@ -31,8 +33,11 @@ function _civicrm_api3_d_b_monitor_probe_spec(&$params) {
  * API Action DBMonitor.probe
  *
  * Check the system for stuck queries and send an email if there are any
+ *
+ * @param array<string, mixed> $params
+ * @return array<string, mixed>
  */
-function civicrm_api3_d_b_monitor_probe(&$params) {
+function civicrm_api3_d_b_monitor_probe(array &$params): array {
   $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
   if (count($queries) === 0) {
     // no stuck queries detected

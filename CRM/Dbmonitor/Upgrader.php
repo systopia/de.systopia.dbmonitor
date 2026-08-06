@@ -23,14 +23,14 @@ class CRM_Dbmonitor_Upgrader extends CRM_Dbmonitor_Upgrader_Base {
   /**
    * Install process
    */
-  public function install() {
+  public function install(): void {
     $this->addScheduledJob();
   }
 
   /**
    * Add scheduled job with 0.3
    */
-  public function upgrade_0031() {
+  public function upgrade_0031(): bool {
     $this->ctx->log->info('Adding scheduled job');
     $this->addScheduledJob();
     return TRUE;
@@ -39,7 +39,7 @@ class CRM_Dbmonitor_Upgrader extends CRM_Dbmonitor_Upgrader_Base {
   /**
    * Helper function to install a scheduled monitoring job
    */
-  protected function addScheduledJob() {
+  protected function addScheduledJob(): void {
     $count = (int) civicrm_api3(
         'Job',
         'getcount',

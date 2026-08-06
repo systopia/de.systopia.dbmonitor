@@ -22,7 +22,7 @@ use CRM_Dbmonitor_ExtensionUtil as E;
  */
 class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
 
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
 
     if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
       throw new Exception(E::ts("You don't have the permission required to edit the DB monitoring settings."));
@@ -69,7 +69,7 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
     parent::buildQuickForm();
   }
 
-  public function postProcess() {
+  public function postProcess(): void {
     if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
       throw new Exception(E::ts("You don't have the permission required to edit the DB monitoring settings."));
     }

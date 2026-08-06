@@ -20,15 +20,15 @@ use CRM_Dbmonitor_ExtensionUtil as E;
  */
 class CRM_Dbmonitor_Monitor {
 
-  protected static $monitoring_temporarily_disabled = FALSE;
+  protected static bool $monitoring_temporarily_disabled = FALSE;
 
   /**
    * Get a list of stuck queries.
    *  Fields: id, runtime, state, sql
    *
-   * @return array of arrays
+   * @return list<array<string, int|string>>
    */
-  public static function getStuckQueries() {
+  public static function getStuckQueries(): array {
     static $stuck_queries = NULL;
     if ($stuck_queries === NULL) {
       $stuck_queries = [];
@@ -61,7 +61,7 @@ class CRM_Dbmonitor_Monitor {
    *  a stuck query, but only if the current
    *  user has the function enabled
    */
-  public static function injectWarning() {
+  public static function injectWarning(): void {
     if (self::monitoringEnabledForUser()) {
       $queries = self::getStuckQueries();
       if (count($queries) > 0) {
@@ -93,10 +93,10 @@ class CRM_Dbmonitor_Monitor {
 
   /**
    * Render a human-readable representation of the time in seconds
-   * @param $seconds
+   * @param int|string $seconds
    * @return string time expression
    */
-  public static function renderRuntime($seconds) {
+  public static function renderRuntime($seconds): string {
     $hours   = floor($seconds / 3600);
     $minutes = floor($seconds / 60 % 60);
     $seconds = floor($seconds % 60);
@@ -124,7 +124,7 @@ class CRM_Dbmonitor_Monitor {
   /**
    * Check if the query monitoring is enabled for the current user
    */
-  public static function monitoringEnabledForUser() {
+  public static function monitoringEnabledForUser(): bool {
     return self::monitoringEnabled() && self::userHasMonitoringPermissions();
   }
 
@@ -145,9 +145,9 @@ class CRM_Dbmonitor_Monitor {
 
   /**
    * Get the list of permissions necessary to access the DB Monitor
-   * @return array list of permissions (or)
+   * @return list<string> list of permissions (or)
    */
-  public static function getPermissions() {
+  public static function getPermissions(): array {
     $permissions = Civi::settings()->get('dbmonitor_permissions');
     if (is_array($permissions)) {
       return $permissions;
@@ -173,7 +173,7 @@ class CRM_Dbmonitor_Monitor {
   /**
    * temporarily disable monitoring
    */
-  public static function disableMonitoring() {
+  public static function disableMonitoring(): void {
     self::$monitoring_temporarily_disabled = TRUE;
   }
 
@@ -205,15 +205,15 @@ class CRM_Dbmonitor_Monitor {
   /**
    * Send an email report of the stuck queries to the given email addresses
    *
-   * @param array $recipients
+   * @param list<string> $recipients
    *  recipients of the report, list of email addresses
-   * @param array $queries
+   * @param list<array<string, int|string>>|null $queries
    *  query list as produced by CRM_Dbmonitor_Monitor::getStuckQueries(). If null, will be pulled there
    *
    * @throws Exception
    *   In case anything's wrong.
    */
-  public static function sendEmailReport($recipients, $queries = NULL) {
+  public static function sendEmailReport($recipients, $queries = NULL): void {
     if ($queries === NULL) {
       $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
     }
