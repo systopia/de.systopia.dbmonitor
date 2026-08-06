@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /*-------------------------------------------------------+
 | DB Monitoring                                          |
 | Copyright (C) 2020 SYSTOPIA                            |
@@ -39,7 +40,8 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     foreach ($queries as $query) {
       if (empty($query['db'])) {
         $own_queries[] = $query;
-      } else {
+      }
+      else {
         $foreign_queries[] = $query;
       }
     }
@@ -64,8 +66,8 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
           CRM_Core_DAO::executeQuery("KILL QUERY {$query_id};");
         }
         CRM_Core_Session::setStatus(
-            E::ts("Terminated query [%1].", [1 => $query_id]),
-            E::ts("Query terminated"),
+            E::ts('Terminated query [%1].', [1 => $query_id]),
+            E::ts('Query terminated'),
             'info');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/dbprocesslist'));
 
@@ -75,7 +77,7 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
         foreach ($queries as $query) {
           if ($query['id'] == $query_id) {
             CRM_Utils_System::download(
-                E::ts("conspicuous_query_%1", [1 => $query_id]),
+                E::ts('conspicuous_query_%1', [1 => $query_id]),
                 'application/sql',
                 $query['sql'],
                 'sql',
@@ -85,9 +87,10 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
         }
         CRM_Core_Session::setStatus(
             E::ts("Query [%1] couldn't be found any more.", [1 => $query_id]),
-            E::ts("Query not found"),
+            E::ts('Query not found'),
             'warn');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/dbprocesslist'));
     }
   }
+
 }

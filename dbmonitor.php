@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable PSR1.Files.SideEffects
+declare(strict_types = 1);
 
 require_once 'dbmonitor.civix.php';
 use CRM_Dbmonitor_ExtensionUtil as E;
@@ -20,7 +22,7 @@ function dbmonitor_civicrm_buildForm($formName, &$form) {
 /**
  * Implements hook_civicrm_config().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/ 
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function dbmonitor_civicrm_config(&$config) {
   _dbmonitor_civix_civicrm_config($config);
@@ -98,22 +100,22 @@ function dbmonitor_civicrm_entityTypes(&$entityTypes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
  *
-
- // */
+ *
+ * // */
 
 /**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
  *
-function dbmonitor_civicrm_navigationMenu(&$menu) {
-  _dbmonitor_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _dbmonitor_civix_navigationMenu($menu);
+ * function dbmonitor_civicrm_navigationMenu(&$menu) {
+ * _dbmonitor_civix_insert_navigation_menu($menu, 'Mailings', array(
+ * 'label' => E::ts('New subliminal message'),
+ * 'name' => 'mailing_subliminal_message',
+ * 'url' => 'civicrm/mailing/subliminal',
+ * 'permission' => 'access CiviMail',
+ * 'operator' => 'OR',
+ * 'separator' => 0,
+ * ));
+ * _dbmonitor_civix_navigationMenu($menu);
 } // */

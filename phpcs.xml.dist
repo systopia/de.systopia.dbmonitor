@@ -10,6 +10,7 @@
     <file>dbmonitor.php</file>
 
     <exclude-pattern>/CRM/Dbmonitor/DAO/.*\.php$</exclude-pattern>
+    <exclude-pattern>/CRM/Dbmonitor/Upgrader/Base\.php$</exclude-pattern>
 
     <arg name="extensions" value="php"/>
     <arg name="cache" value=".phpcs.cache"/>

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /*-------------------------------------------------------+
 | DB Monitoring                                          |
 | Copyright (C) 2020 SYSTOPIA                            |
@@ -20,6 +21,7 @@ use CRM_Dbmonitor_ExtensionUtil as E;
  * @see https://docs.civicrm.org/dev/en/latest/framework/quickform/
  */
 class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
+
   public function buildQuickForm() {
 
     if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
@@ -36,7 +38,7 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
         'select',
         'permissions',
         E::ts('Permissions'),
-        CRM_Core_Permission::basicPermissions(true),
+        CRM_Core_Permission::basicPermissions(TRUE),
         TRUE,
         ['class' => 'crm-select2', 'multiple' => 'multiple']
     );
@@ -51,17 +53,17 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
 
     $this->addButtons([
         [
-            'type'      => 'submit',
-            'name'      => E::ts('Save'),
-            'isDefault' => TRUE,
-        ]
+          'type'      => 'submit',
+          'name'      => E::ts('Save'),
+          'isDefault' => TRUE,
+        ],
     ]);
 
     // set defaults
     $this->setDefaults([
-        'monitoring'  => CRM_Dbmonitor_Monitor::monitoringEnabled(),
-        'permissions' => CRM_Dbmonitor_Monitor::getPermissions(),
-        'threshold'   => CRM_Dbmonitor_Monitor::getThreshold(),
+      'monitoring'  => CRM_Dbmonitor_Monitor::monitoringEnabled(),
+      'permissions' => CRM_Dbmonitor_Monitor::getPermissions(),
+      'threshold'   => CRM_Dbmonitor_Monitor::getThreshold(),
     ]);
 
     parent::buildQuickForm();
@@ -81,4 +83,5 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
 
     parent::postProcess();
   }
+
 }
