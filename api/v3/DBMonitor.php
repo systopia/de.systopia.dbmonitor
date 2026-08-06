@@ -34,14 +34,14 @@ function _civicrm_api3_d_b_monitor_probe_spec(&$params) {
  */
 function civicrm_api3_d_b_monitor_probe(&$params) {
   $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
-  if (empty($queries)) {
+  if (count($queries) === 0) {
     // no stuck queries detected
     return civicrm_api3_create_success(E::ts('No stuck queries detected'));
   }
 
   // find out recipient emails
   $recipients_emails = [];
-  if (empty($params['email_recipients'])) {
+  if (!isset($params['email_recipients']) || $params['email_recipients'] === '') {
     $contact_id = CRM_Core_Session::getLoggedInContactID();
     if ($contact_id) {
       try {
@@ -57,7 +57,7 @@ function civicrm_api3_d_b_monitor_probe(&$params) {
         );
       }
       catch (CRM_Core_Exception $ex) {
-        // contact doesn't seem to have a primary email
+        // @ignoreException contact doesn't seem to have a primary email
       }
     }
 
@@ -71,8 +71,8 @@ function civicrm_api3_d_b_monitor_probe(&$params) {
     }
   }
 
-  if (empty($recipients_emails)) {
-    if (empty($params['email_recipients'])) {
+  if (count($recipients_emails) === 0) {
+    if (!isset($params['email_recipients']) || $params['email_recipients'] === '') {
       return civicrm_api3_create_error(E::ts('Current user has no valid email.'));
     }
     else {

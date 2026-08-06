@@ -78,7 +78,7 @@ function dbmonitor_civicrm_disable() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
  */
-function dbmonitor_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+function dbmonitor_civicrm_upgrade($op, ?CRM_Queue_Queue $queue = NULL) {
   return _dbmonitor_civix_civicrm_upgrade($op, $queue);
 }
 

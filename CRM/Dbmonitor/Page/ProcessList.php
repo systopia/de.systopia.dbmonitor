@@ -38,7 +38,7 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     $own_queries = [];
     $foreign_queries = [];
     foreach ($queries as $query) {
-      if (empty($query['db'])) {
+      if ($query['db'] === '') {
         $own_queries[] = $query;
       }
       else {
@@ -75,7 +75,7 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
         // export the query SQL
         $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
         foreach ($queries as $query) {
-          if ($query['id'] == $query_id) {
+          if ((int) $query['id'] === $query_id) {
             CRM_Utils_System::download(
                 E::ts('conspicuous_query_%1', [1 => $query_id]),
                 'application/sql',

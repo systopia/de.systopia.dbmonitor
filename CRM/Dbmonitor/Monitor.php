@@ -39,7 +39,7 @@ class CRM_Dbmonitor_Monitor {
 
       $process_list = CRM_Core_DAO::executeQuery('SHOW FULL PROCESSLIST;');
       while ($process_list->fetch()) {
-        if ($process_list->Time >= $threshold && !empty($process_list->State)) {
+        if ($process_list->Time >= $threshold && $process_list->State !== NULL && $process_list->State !== '') {
           $stuck_queries[] = [
             'id'           => $process_list->Id,
             'runtime'      => $process_list->Time,
@@ -48,7 +48,7 @@ class CRM_Dbmonitor_Monitor {
             'sql'          => $process_list->Info,
             'type'         => self::getQueryType($process_list->Info),
             'sql_short'    => substr($process_list->Info, 0, 64),
-            'db'           => ($process_list->db == $database) ? '' : $process_list->db,
+            'db'           => ($process_list->db === $database) ? '' : $process_list->db,
           ];
         }
       }
@@ -218,8 +218,8 @@ class CRM_Dbmonitor_Monitor {
       $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
     }
 
-    if (!empty($queries)) {
-      if (empty($recipients)) {
+    if (count($queries) > 0) {
+      if (count($recipients) === 0) {
         throw new Exception('No recipients');
       }
 

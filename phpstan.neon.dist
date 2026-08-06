@@ -8,6 +8,7 @@ parameters:
 	excludePaths:
 		analyse:
 			- CRM/Dbmonitor/DAO/*
+			- CRM/Dbmonitor/Upgrader/Base.php
 			- tests/phpunit/bootstrap.php
 	scanFiles:
 		- dbmonitor.civix.php
@@ -44,4 +45,5 @@ parameters:
 	ignoreErrors:
 		# Note paths are prefixed with "*/" to work with inspections in PHPStorm because of:
 		# https://youtrack.jetbrains.com/issue/WI-63891/PHPStan-ignoreErrors-configuration-isnt-working-with-inspections
+		- '#^Do not throw the \\Exception base class\.$#'
 	tmpDir: .phpstan

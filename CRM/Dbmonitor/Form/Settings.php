@@ -77,7 +77,7 @@ class CRM_Dbmonitor_Form_Settings extends CRM_Core_Form {
     $values = $this->exportValues();
 
     // set values
-    Civi::settings()->set('dbmonitor_enabled', CRM_Utils_Array::value('monitoring', $values, 0));
+    Civi::settings()->set('dbmonitor_enabled', $values['monitoring'] ?? 0);
     Civi::settings()->set('dbmonitor_threshold', $values['threshold']);
     Civi::settings()->set('dbmonitor_permissions', $values['permissions']);
 
