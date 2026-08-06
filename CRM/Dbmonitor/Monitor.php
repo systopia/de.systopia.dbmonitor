@@ -238,7 +238,7 @@ class CRM_Dbmonitor_Monitor {
       // render content
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('queries', $queries);
-      $smarty->assign('dbmonitorlink', CRM_Utils_System::url('civicrm/admin/dbprocesslist', NULL, TRUE));
+      $smarty->assign('dbmonitorlink', CRM_Utils_System::url('civicrm/admin/dbprocesslist', '', TRUE));
       $smarty_template = E::path('templates/probe_email.tpl');
       $email['html'] = $smarty->fetch($smarty_template);
 
