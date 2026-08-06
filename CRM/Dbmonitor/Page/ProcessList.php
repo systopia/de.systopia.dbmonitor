@@ -30,7 +30,10 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     // process ops
     $operation = CRM_Utils_Request::retrieve('op', 'String');
     $query_id  = CRM_Utils_Request::retrieve('id', 'Integer');
-    $this->performOperation($operation, $query_id);
+    $this->performOperation(
+        is_string($operation) ? $operation : NULL,
+        is_int($query_id) ? $query_id : NULL
+    );
 
     // just add the queries
     $queries = CRM_Dbmonitor_Monitor::getStuckQueries();

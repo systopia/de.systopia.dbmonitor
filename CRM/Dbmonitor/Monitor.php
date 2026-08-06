@@ -26,7 +26,16 @@ class CRM_Dbmonitor_Monitor {
    * Get a list of stuck queries.
    *  Fields: id, runtime, state, sql
    *
-   * @return list<array<string, int|string>>
+   * @return list<array{
+   *   id: int|string,
+   *   runtime: int|string,
+   *   runtime_text: string,
+   *   state: string,
+   *   sql: string,
+   *   type: string,
+   *   sql_short: string,
+   *   db: string,
+   *   }>
    */
   public static function getStuckQueries(): array {
     static $stuck_queries = NULL;
@@ -37,6 +46,7 @@ class CRM_Dbmonitor_Monitor {
       $database  = DB::parseDSN(CIVICRM_DSN)['database'];
       $threshold = self::getThreshold();
 
+      /** @var CRM_Core_DAO $process_list */
       $process_list = CRM_Core_DAO::executeQuery('SHOW FULL PROCESSLIST;');
       while ($process_list->fetch()) {
         if ($process_list->Time >= $threshold && $process_list->State !== NULL && $process_list->State !== '') {
@@ -97,6 +107,7 @@ class CRM_Dbmonitor_Monitor {
    * @return string time expression
    */
   public static function renderRuntime($seconds): string {
+    $seconds = (int) $seconds;
     $hours   = floor($seconds / 3600);
     $minutes = floor($seconds / 60 % 60);
     $seconds = floor($seconds % 60);
@@ -150,7 +161,7 @@ class CRM_Dbmonitor_Monitor {
   public static function getPermissions(): array {
     $permissions = Civi::settings()->get('dbmonitor_permissions');
     if (is_array($permissions)) {
-      return $permissions;
+      return array_values(array_filter($permissions, 'is_string'));
     }
     else {
       return ['administer CiviCRM'];
@@ -193,7 +204,8 @@ class CRM_Dbmonitor_Monitor {
    * @return integer time in seconds
    */
   public static function getThreshold() {
-    $threshold = (int) Civi::settings()->get('dbmonitor_threshold');
+    $threshold_raw = Civi::settings()->get('dbmonitor_threshold');
+    $threshold = is_numeric($threshold_raw) ? (int) $threshold_raw : 0;
     if ($threshold !== 0) {
       return $threshold;
     }
@@ -207,12 +219,14 @@ class CRM_Dbmonitor_Monitor {
    *
    * @param list<string> $recipients
    *  recipients of the report, list of email addresses
-   * @param list<array<string, int|string>>|null $queries
+   * phpcs:ignore Generic.Files.LineLength.TooLong
+   * @param list<array{id: int|string, runtime: int|string, runtime_text: string, state: string, sql: string, type: string, sql_short: string, db: string}>|null $queries
    *  query list as produced by CRM_Dbmonitor_Monitor::getStuckQueries(). If null, will be pulled there
    *
    * @throws Exception
    *   In case anything's wrong.
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function sendEmailReport($recipients, $queries = NULL): void {
     if ($queries === NULL) {
       $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
@@ -224,12 +238,15 @@ class CRM_Dbmonitor_Monitor {
       }
 
       // compile email
-      $url_parts = parse_url(CRM_Core_Config::singleton()->userFrameworkBaseURL);
+      $base_url = CRM_Core_Config::singleton()->userFrameworkBaseURL;
+      $url_parts = is_string($base_url) ? parse_url($base_url) : FALSE;
+      $url_host = is_array($url_parts) ? ($url_parts['host'] ?? '') : '';
+      $url_path = is_array($url_parts) ? ($url_parts['path'] ?? '') : '';
       list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
       $domain = CRM_Core_BAO_Domain::getDomain();
       $email = [
         'subject' => E::ts("DB Monitoring: Conspicuous queries spotted on '%1 (%2)'", [
-          1 => trim($url_parts['host'] . $url_parts['path'], '/ '),
+          1 => trim($url_host . $url_path, '/ '),
           2 => $domain->_database,
         ]),
         'from'    => CRM_Utils_Mail::formatRFC822Email($domainEmailName, $domainEmailAddress),
@@ -277,13 +294,13 @@ class CRM_Dbmonitor_Monitor {
    */
   public static function getQueryType($sql) {
     // simply look for a couple if tell-tale strings in the query...
-    if (preg_match('/INTO civicrm_tmp_._gccache/i', $sql)) {
+    if (preg_match('/INTO civicrm_tmp_._gccache/i', $sql) === 1) {
       return E::ts('GroupCache Rebuild');
     }
-    if (preg_match('/_dedupe_/', $sql)) {
+    if (preg_match('/_dedupe_/', $sql) === 1) {
       return E::ts('Deduplication');
     }
-    if (preg_match('/civireport/', $sql)) {
+    if (preg_match('/civireport/', $sql) === 1) {
       return E::ts('CiviCRM Report');
     }
     return E::ts('Unknown');

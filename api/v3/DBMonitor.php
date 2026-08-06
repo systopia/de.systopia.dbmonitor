@@ -37,6 +37,7 @@ function _civicrm_api3_d_b_monitor_probe_spec(array &$params): void {
  * @param array<string, mixed> $params
  * @return array<string, mixed>
  */
+// phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 function civicrm_api3_d_b_monitor_probe(array &$params): array {
   $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
   if (count($queries) === 0) {
@@ -50,7 +51,7 @@ function civicrm_api3_d_b_monitor_probe(array &$params): array {
     $contact_id = CRM_Core_Session::getLoggedInContactID();
     if ($contact_id !== NULL && $contact_id > 0) {
       try {
-        $recipients_emails[] = civicrm_api3(
+        $primary_email = civicrm_api3(
         'Email',
         'getvalue',
         [
@@ -60,6 +61,9 @@ function civicrm_api3_d_b_monitor_probe(array &$params): array {
           'option.limit' => 1,
         ]
         );
+        if (is_string($primary_email)) {
+          $recipients_emails[] = $primary_email;
+        }
       }
       catch (CRM_Core_Exception $ex) {
         // @ignoreException contact doesn't seem to have a primary email
@@ -68,10 +72,14 @@ function civicrm_api3_d_b_monitor_probe(array &$params): array {
 
   }
   else {
-    foreach (preg_split('/,/', $params['email_recipients']) as $email) {
-      $email = trim($email);
-      if ($email !== '') {
-        $recipients_emails[] = $email;
+    $email_recipients_param = is_string($params['email_recipients']) ? $params['email_recipients'] : '';
+    $email_recipient_parts = preg_split('/,/', $email_recipients_param);
+    if ($email_recipient_parts !== FALSE) {
+      foreach ($email_recipient_parts as $email) {
+        $email = trim($email);
+        if ($email !== '') {
+          $recipients_emails[] = $email;
+        }
       }
     }
   }
