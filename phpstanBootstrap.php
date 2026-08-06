@@ -23,6 +23,13 @@ declare(strict_types = 1);
 
 use Composer\Autoload\ClassLoader;
 
+// CIVICRM_DSN is normally defined at runtime in the site-specific
+// civicrm.settings.php, which doesn't exist during static analysis. Provide a
+// stub value so PHPStan can resolve the constant's type.
+if (!defined('CIVICRM_DSN')) {
+  define('CIVICRM_DSN', 'mysql://user:pass@localhost/civicrm');
+}
+
 $bootstrapFiles = $container->getParameter('bootstrapFiles');
 foreach ($bootstrapFiles as $bootstrapFile) {
   if (str_ends_with($bootstrapFile, 'vendor/autoload.php')) {

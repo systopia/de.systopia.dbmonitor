@@ -100,16 +100,16 @@ class CRM_Dbmonitor_Monitor {
     $hours   = floor($seconds / 3600);
     $minutes = floor($seconds / 60 % 60);
     $seconds = floor($seconds % 60);
-    if ($hours) {
-      if ($minutes) {
+    if ($hours > 0) {
+      if ($minutes > 0) {
         return E::ts('%1 hours and %2 minutes', [1 => $hours, 2 => $minutes]);
       }
       else {
         return E::ts('%1 hours', [1 => $hours]);
       }
     }
-    elseif ($minutes) {
-      if ($seconds) {
+    elseif ($minutes > 0) {
+      if ($seconds > 0) {
         return E::ts('%1 minutes and %2 seconds', [1 => $minutes, 2 => $seconds]);
       }
       else {
@@ -194,7 +194,7 @@ class CRM_Dbmonitor_Monitor {
    */
   public static function getThreshold() {
     $threshold = (int) Civi::settings()->get('dbmonitor_threshold');
-    if ($threshold) {
+    if ($threshold !== 0) {
       return $threshold;
     }
     else {

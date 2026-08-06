@@ -43,7 +43,7 @@ function civicrm_api3_d_b_monitor_probe(&$params) {
   $recipients_emails = [];
   if (!isset($params['email_recipients']) || $params['email_recipients'] === '') {
     $contact_id = CRM_Core_Session::getLoggedInContactID();
-    if ($contact_id) {
+    if ($contact_id !== NULL && $contact_id > 0) {
       try {
         $recipients_emails[] = civicrm_api3(
         'Email',
@@ -65,7 +65,7 @@ function civicrm_api3_d_b_monitor_probe(&$params) {
   else {
     foreach (preg_split('/,/', $params['email_recipients']) as $email) {
       $email = trim($email);
-      if ($email) {
+      if ($email !== '') {
         $recipients_emails[] = $email;
       }
     }

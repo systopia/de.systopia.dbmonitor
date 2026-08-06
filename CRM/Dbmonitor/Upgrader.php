@@ -40,7 +40,7 @@ class CRM_Dbmonitor_Upgrader extends CRM_Dbmonitor_Upgrader_Base {
    * Helper function to install a scheduled monitoring job
    */
   protected function addScheduledJob() {
-    $count = civicrm_api3(
+    $count = (int) civicrm_api3(
         'Job',
         'getcount',
         [
@@ -49,7 +49,7 @@ class CRM_Dbmonitor_Upgrader extends CRM_Dbmonitor_Upgrader_Base {
         ]
     );
 
-    if (!$count) {
+    if ($count === 0) {
       // job doesn't exist => create
       civicrm_api3(
         'Job',
