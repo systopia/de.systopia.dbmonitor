@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /*-------------------------------------------------------+
 | DB Monitoring                                          |
 | Copyright (C) 2020 SYSTOPIA                            |
@@ -16,11 +17,11 @@ use CRM_Dbmonitor_ExtensionUtil as E;
 
 class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
 
-  public function run() {
+  public function run(): void {
     CRM_Utils_System::setTitle(E::ts('Conspicuous Database Queries'));
 
     if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
-      throw new Exception(E::ts("You don't have the permission required to view this page."));
+      throw new CRM_Core_Exception(E::ts("You don't have the permission required to view this page."));
     }
 
     // disable the warning for this page
@@ -29,7 +30,10 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     // process ops
     $operation = CRM_Utils_Request::retrieve('op', 'String');
     $query_id  = CRM_Utils_Request::retrieve('id', 'Integer');
-    $this->performOperation($operation, $query_id);
+    $this->performOperation(
+        is_string($operation) ? $operation : NULL,
+        is_int($query_id) ? $query_id : NULL
+    );
 
     // just add the queries
     $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
@@ -37,9 +41,10 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     $own_queries = [];
     $foreign_queries = [];
     foreach ($queries as $query) {
-      if (empty($query['db'])) {
+      if ($query['db'] === NULL || $query['db'] === '') {
         $own_queries[] = $query;
-      } else {
+      }
+      else {
         $foreign_queries[] = $query;
       }
     }
@@ -53,19 +58,19 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
   /**
    * Execute the passed operation
    *
-   * @param $operation string operation name
-   * @param $query_id  int    query id
+   * @param string|null $operation string operation name
+   * @param int|null $query_id  int    query id
    */
-  protected function performOperation($operation, $query_id) {
+  protected function performOperation(?string $operation, ?int $query_id): void {
     switch ($operation) {
       case 'kill':
         // kill the query
-        if ($query_id) {
+        if ($query_id !== NULL && $query_id > 0) {
           CRM_Core_DAO::executeQuery("KILL QUERY {$query_id};");
         }
         CRM_Core_Session::setStatus(
-            E::ts("Terminated query [%1].", [1 => $query_id]),
-            E::ts("Query terminated"),
+            E::ts('Terminated query [%1].', [1 => $query_id]),
+            E::ts('Query terminated'),
             'info');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/dbprocesslist'));
 
@@ -73,11 +78,12 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
         // export the query SQL
         $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
         foreach ($queries as $query) {
-          if ($query['id'] == $query_id) {
+          if ((int) $query['id'] === $query_id) {
+            $sql = $query['sql'] ?? '';
             CRM_Utils_System::download(
-                E::ts("conspicuous_query_%1", [1 => $query_id]),
+                E::ts('conspicuous_query_%1', [1 => $query_id]),
                 'application/sql',
-                $query['sql'],
+                $sql,
                 'sql',
                 TRUE
             );
@@ -85,9 +91,10 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
         }
         CRM_Core_Session::setStatus(
             E::ts("Query [%1] couldn't be found any more.", [1 => $query_id]),
-            E::ts("Query not found"),
+            E::ts('Query not found'),
             'warn');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/dbprocesslist'));
     }
   }
+
 }

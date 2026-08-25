@@ -18,17 +18,21 @@
   <version>1.1.1</version>
   <develStage/>
   <compatibility>
-    <ver>5.65</ver>
+    <ver>5.76</ver>
   </compatibility>
   <comments/>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
+    <psr0 prefix="CRM_" path="."/>
   </classloader>
   <civix>
     <namespace>CRM/Dbmonitor</namespace>
-    <format>22.05.2</format>
+    <format>25.10.2</format>
   </civix>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
+  <upgrader>CiviMix\Schema\Dbmonitor\AutomaticUpgrader</upgrader>
 </extension>

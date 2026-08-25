@@ -1,0 +1,27 @@
+site_name: Database Monitor
+site_description: Will try to spot conspicuous or "stuck" database queries.
+site_author: B. Endres
+repo_url: https://github.com/systopia/de.systopia.dbmonitor
+
+theme:
+  name: material
+
+nav:
+  - Introduction: index.md
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - def_list
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.betterem
+  - pymdownx.mark
+
+plugins:
+  - search:
+      lang: en
