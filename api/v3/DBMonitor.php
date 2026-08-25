@@ -30,22 +30,10 @@ function _civicrm_api3_d_b_monitor_probe_spec(array &$params): void {
 }
 
 /**
- * API Action DBMonitor.probe
- *
- * Check the system for stuck queries and send an email if there are any
- *
  * @param array<string, mixed> $params
- * @return array<string, mixed>
+ * @return list<string>
  */
-// phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-function civicrm_api3_d_b_monitor_probe(array &$params): array {
-  $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
-  if (count($queries) === 0) {
-    // no stuck queries detected
-    return civicrm_api3_create_success(E::ts('No stuck queries detected'));
-  }
-
-  // find out recipient emails
+function _civicrm_api3_d_b_monitor_probe_recipients(array $params): array {
   $recipients_emails = [];
   if (!isset($params['email_recipients']) || $params['email_recipients'] === '') {
     $contact_id = CRM_Core_Session::getLoggedInContactID();
@@ -83,6 +71,27 @@ function civicrm_api3_d_b_monitor_probe(array &$params): array {
       }
     }
   }
+
+  return $recipients_emails;
+}
+
+/**
+ * API Action DBMonitor.probe
+ *
+ * Check the system for stuck queries and send an email if there are any
+ *
+ * @param array<string, mixed> $params
+ * @return array<string, mixed>
+ */
+function civicrm_api3_d_b_monitor_probe(array &$params): array {
+  $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
+  if (count($queries) === 0) {
+    // no stuck queries detected
+    return civicrm_api3_create_success(E::ts('No stuck queries detected'));
+  }
+
+  // find out recipient emails
+  $recipients_emails = _civicrm_api3_d_b_monitor_probe_recipients($params);
 
   if (count($recipients_emails) === 0) {
     if (!isset($params['email_recipients']) || $params['email_recipients'] === '') {

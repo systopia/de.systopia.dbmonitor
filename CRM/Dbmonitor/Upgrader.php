@@ -18,7 +18,7 @@ use CRM_Dbmonitor_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Dbmonitor_Upgrader extends CRM_Dbmonitor_Upgrader_Base {
+class CRM_Dbmonitor_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Install process

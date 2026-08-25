@@ -31,10 +31,10 @@ class CRM_Dbmonitor_Monitor {
    *   runtime: int|string,
    *   runtime_text: string,
    *   state: string,
-   *   sql: string,
+   *   sql: string|null,
    *   type: string,
    *   sql_short: string,
-   *   db: string,
+   *   db: string|null,
    *   }>
    */
   public static function getStuckQueries(): array {
@@ -43,22 +43,24 @@ class CRM_Dbmonitor_Monitor {
       $stuck_queries = [];
 
       // get some params
-      $database  = DB::parseDSN(CIVICRM_DSN)['database'];
+      $database  = CRM_Core_DAO::singleValueQuery('SELECT DATABASE()');
       $threshold = self::getThreshold();
 
       /** @var CRM_Core_DAO $process_list */
       $process_list = CRM_Core_DAO::executeQuery('SHOW FULL PROCESSLIST;');
       while ($process_list->fetch()) {
         if ($process_list->Time >= $threshold && $process_list->State !== NULL && $process_list->State !== '') {
+          $sql = is_string($process_list->Info) ? $process_list->Info : NULL;
+          $db = is_string($process_list->db) ? $process_list->db : NULL;
           $stuck_queries[] = [
             'id'           => $process_list->Id,
             'runtime'      => $process_list->Time,
             'runtime_text' => self::renderRuntime($process_list->Time),
             'state'        => $process_list->State,
-            'sql'          => $process_list->Info,
-            'type'         => self::getQueryType($process_list->Info),
-            'sql_short'    => substr($process_list->Info, 0, 64),
-            'db'           => ($process_list->db === $database) ? '' : $process_list->db,
+            'sql'          => $sql,
+            'type'         => self::getQueryType($sql ?? ''),
+            'sql_short'    => substr($sql ?? '', 0, 64),
+            'db'           => ($db === $database) ? '' : $db,
           ];
         }
       }
@@ -108,9 +110,9 @@ class CRM_Dbmonitor_Monitor {
    */
   public static function renderRuntime($seconds): string {
     $seconds = (int) $seconds;
-    $hours   = floor($seconds / 3600);
-    $minutes = floor($seconds / 60 % 60);
-    $seconds = floor($seconds % 60);
+    $hours   = intdiv($seconds, 3600);
+    $minutes = intdiv($seconds, 60) % 60;
+    $seconds = $seconds % 60;
     if ($hours > 0) {
       if ($minutes > 0) {
         return E::ts('%1 hours and %2 minutes', [1 => $hours, 2 => $minutes]);
@@ -220,13 +222,12 @@ class CRM_Dbmonitor_Monitor {
    * @param list<string> $recipients
    *  recipients of the report, list of email addresses
    * phpcs:ignore Generic.Files.LineLength.TooLong
-   * @param list<array{id: int|string, runtime: int|string, runtime_text: string, state: string, sql: string, type: string, sql_short: string, db: string}>|null $queries
+   * @param list<array{id: int|string, runtime: int|string, runtime_text: string, state: string, sql: string|null, type: string, sql_short: string, db: string|null}>|null $queries
    *  query list as produced by CRM_Dbmonitor_Monitor::getStuckQueries(). If null, will be pulled there
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    *   In case anything's wrong.
    */
-  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function sendEmailReport($recipients, $queries = NULL): void {
     if ($queries === NULL) {
       $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
@@ -234,19 +235,15 @@ class CRM_Dbmonitor_Monitor {
 
     if (count($queries) > 0) {
       if (count($recipients) === 0) {
-        throw new Exception('No recipients');
+        throw new CRM_Core_Exception('No recipients');
       }
 
       // compile email
-      $base_url = CRM_Core_Config::singleton()->userFrameworkBaseURL;
-      $url_parts = is_string($base_url) ? parse_url($base_url) : FALSE;
-      $url_host = is_array($url_parts) ? ($url_parts['host'] ?? '') : '';
-      $url_path = is_array($url_parts) ? ($url_parts['path'] ?? '') : '';
       list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
       $domain = CRM_Core_BAO_Domain::getDomain();
       $email = [
         'subject' => E::ts("DB Monitoring: Conspicuous queries spotted on '%1 (%2)'", [
-          1 => trim($url_host . $url_path, '/ '),
+          1 => self::getSiteName(),
           2 => $domain->_database,
         ]),
         'from'    => CRM_Utils_Mail::formatRFC822Email($domainEmailName, $domainEmailAddress),
@@ -265,7 +262,7 @@ class CRM_Dbmonitor_Monitor {
         // remark: using the same files every time, so we don't clog up /tmp
         $file_name = "process-{$query['id']}.sql";
         $tmp_file_name = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'dbmonitor_' . $file_name;
-        file_put_contents($tmp_file_name, $query['sql']);
+        file_put_contents($tmp_file_name, $query['sql'] ?? '');
 
         // and add as attachment
         $email['attachments'][] = [
@@ -281,6 +278,14 @@ class CRM_Dbmonitor_Monitor {
         CRM_Utils_Mail::send($email);
       }
     }
+  }
+
+  protected static function getSiteName(): string {
+    $base_url = CRM_Core_Config::singleton()->userFrameworkBaseURL;
+    $url_parts = is_string($base_url) ? parse_url($base_url) : FALSE;
+    $url_host = is_array($url_parts) ? ($url_parts['host'] ?? '') : '';
+    $url_path = is_array($url_parts) ? ($url_parts['path'] ?? '') : '';
+    return trim($url_host . $url_path, '/ ');
   }
 
   /**

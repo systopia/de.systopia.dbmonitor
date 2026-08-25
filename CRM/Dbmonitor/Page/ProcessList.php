@@ -21,7 +21,7 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     CRM_Utils_System::setTitle(E::ts('Conspicuous Database Queries'));
 
     if (!CRM_Dbmonitor_Monitor::userHasMonitoringPermissions()) {
-      throw new Exception(E::ts("You don't have the permission required to view this page."));
+      throw new CRM_Core_Exception(E::ts("You don't have the permission required to view this page."));
     }
 
     // disable the warning for this page
@@ -41,7 +41,7 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
     $own_queries = [];
     $foreign_queries = [];
     foreach ($queries as $query) {
-      if ($query['db'] === '') {
+      if ($query['db'] === NULL || $query['db'] === '') {
         $own_queries[] = $query;
       }
       else {
@@ -79,10 +79,11 @@ class CRM_Dbmonitor_Page_ProcessList extends CRM_Core_Page {
         $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
         foreach ($queries as $query) {
           if ((int) $query['id'] === $query_id) {
+            $sql = $query['sql'] ?? '';
             CRM_Utils_System::download(
                 E::ts('conspicuous_query_%1', [1 => $query_id]),
                 'application/sql',
-                $query['sql'],
+                $sql,
                 'sql',
                 TRUE
             );
