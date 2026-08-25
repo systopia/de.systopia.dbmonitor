@@ -146,7 +146,7 @@ class CRM_Dbmonitor_Monitor {
    *
    * @return bool
    */
-  public static function userHasMonitoringPermissions() {
+  public static function userHasMonitoringPermissions(): bool {
     $permissions = self::getPermissions();
     foreach ($permissions as $permission) {
       if (CRM_Core_Permission::check($permission)) {
@@ -174,7 +174,7 @@ class CRM_Dbmonitor_Monitor {
    * Is the in-page monitoring enabled?
    * @return bool enabled?
    */
-  public static function monitoringEnabled() {
+  public static function monitoringEnabled(): bool {
     if (self::$monitoring_temporarily_disabled) {
       return FALSE;
     }
@@ -193,9 +193,9 @@ class CRM_Dbmonitor_Monitor {
   /**
    * Is the injected per-call monitoring enabled?
    *
-   * @return boolean enabled?
+   * @return bool enabled?
    */
-  public static function warningsEnabled() {
+  public static function warningsEnabled(): bool {
     return (bool) Civi::settings()->get('dbmonitor_warnings');
   }
 
@@ -203,9 +203,9 @@ class CRM_Dbmonitor_Monitor {
    * Get the runtime threshold with which e query
    *  is considered "stuck"
    *
-   * @return integer time in seconds
+   * @return int time in seconds
    */
-  public static function getThreshold() {
+  public static function getThreshold(): int {
     $threshold_raw = Civi::settings()->get('dbmonitor_threshold');
     $threshold = is_numeric($threshold_raw) ? (int) $threshold_raw : 0;
     if ($threshold !== 0) {
@@ -228,7 +228,7 @@ class CRM_Dbmonitor_Monitor {
    * @throws CRM_Core_Exception
    *   In case anything's wrong.
    */
-  public static function sendEmailReport($recipients, $queries = NULL): void {
+  public static function sendEmailReport(array $recipients, ?array $queries = NULL): void {
     if ($queries === NULL) {
       $queries = CRM_Dbmonitor_Monitor::getStuckQueries();
     }
@@ -297,7 +297,7 @@ class CRM_Dbmonitor_Monitor {
    * @return string
    *   human readable string to give an indication of what kind of query it is
    */
-  public static function getQueryType($sql) {
+  public static function getQueryType(string $sql): string {
     // simply look for a couple if tell-tale strings in the query...
     if (preg_match('/INTO civicrm_tmp_._gccache/i', $sql) === 1) {
       return E::ts('GroupCache Rebuild');
